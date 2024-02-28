@@ -1,15 +1,16 @@
 'use client'
 
 import Image from "next/image";
-import { todo } from "node:test";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import Swal from "sweetalert2";
 
 interface Todo {
   id: string;
   title: string;
   description: string;
   completed: boolean;
+  timestamp: string;
 }
 
 export default function Home() {
@@ -19,6 +20,7 @@ export default function Home() {
 
   useEffect(() => {
     try {
+      document.title = "Home - AppTodo"
       const storedTodos = localStorage.getItem("todos")
       if (storedTodos) {
         setTodos(JSON.parse(storedTodos) as Todo[]);
@@ -26,7 +28,13 @@ export default function Home() {
     } catch (e) {
       console.error(e);
     }
-  }, [todos])
+  }, [])
+
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const options = { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" };
+    return date.toLocaleDateString("en-US", options);
+  };
 
   const addTodo = (e: any) => {
     e.preventDefault();
@@ -35,7 +43,8 @@ export default function Home() {
       id: uuidv4(),
       title: title,
       description: description,
-      completed: false
+      completed: false,
+      timestamp: formatTimestamp(new Date().toISOString())
     }
 
     todos.push(newTodo)
@@ -46,18 +55,71 @@ export default function Home() {
     setDescription("");
   }
 
+  const checkTodo = (id: string) => {
+    const todoIndex = todos.findIndex((todo) => todo.id === id);
+
+    if (todoIndex !== -1) {
+      const updatedTodos = [...todos];
+      updatedTodos[todoIndex].completed = !updatedTodos[todoIndex].completed;
+
+      setTodos(updatedTodos);
+
+      localStorage.setItem("todos", JSON.stringify(updatedTodos));
+    } else {
+      console.error("Todo with ID", id, "not found");
+    }
+  };
+
   const deleteAllTodos = (e: any) => {
     e.preventDefault();
+    Swal.fire({
+      title: 'Want to delete all todos?',
+      icon: "warning",
+      showCancelButton: true,
+    }).then(result => {
+      if (result.isConfirmed) {
+        localStorage.setItem("todos", "");
+        setTodos([])
+      }
+    })
+  }
 
-    localStorage.setItem("todos", "");
+  const deleteTodo = (id: string) => {
+    Swal.fire({
+      title: 'Want to delete this todo?',
+      icon: "warning",
+      showCancelButton: true,
+    }).then(result => {
+      if (result.isConfirmed) {
+        const todoIndex = todos.findIndex((todo) => todo.id === id);
+
+        if (todoIndex !== -1) {
+          const updatedTodos = [...todos];
+
+          updatedTodos.splice(todoIndex, 1);
+
+          setTodos(updatedTodos);
+          localStorage.setItem("todos", JSON.stringify(updatedTodos));
+        } else {
+          console.error("Todo with ID", id, "not found");
+        }
+      }
+    })
+  };
+
+  const formKeyPress = (e: any) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addTodo(e);
+    }
   }
 
   return (
     <>
-      <div className="flex justify-end mb-4">
+      <div className="justify-end mb-4 hidden md:flex">
         <button onClick={deleteAllTodos} className="bg-red-500 p-2 rounded text-white transition-colors hover:bg-red-600">Delete All</button>
       </div>
-      <div className="grid grid-cols-[20%_80%] space-x-4">
+      <div className="grid grid-cols-[20%_80%] space-x-4 max-md:grid-cols-1 max-md:space-x-0 max-md:space-y-8">
         <div>
           <form onSubmit={addTodo} className="grid grid-cols-1 gap-4">
             <div className="flex flex-col">
@@ -83,19 +145,31 @@ export default function Home() {
                 value={description}
               />
             </div>
-            <button type="submit" className="bg-green-500 text-white py-2 rounded transition-colors hover:bg-green-600">
+            <button type="submit" className="bg-green-500 text-white py-2 rounded transition-colors hover:bg-green-600 focus:outline-blue-500">
               Add Todo
             </button>
           </form>
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col">
+          <div className="justify-end mb-4 hidden max-md:flex">
+            <button onClick={deleteAllTodos} className="bg-red-500 p-2 rounded text-white transition-colors hover:bg-red-600">Delete All</button>
+          </div>
           <div className="flex flex-col gap-2">
             {todos.length > 0 ? (
               todos.map((todo) => (
-                <div key={todo.id} className="bg-stone-200 p-2 rounded">
+                <div key={todo.id} className="border border-stone-200 p-2 rounded flex justify-between">
                   <div className="flex flex-col">
-                    <h3 className="text-lg font-semibold line-clamp-1">{todo.title}</h3>
-                    <p className="line-clamp-3">{todo.description}</p>
+                    <span className="text-sm text-stone-500">{todo.timestamp}</span>
+                    <h3 className="text-xl font-semibold line-clamp-1">{todo.title}</h3>
+                    <p className="line-clamp-4">{todo.description}</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    {todo.completed ? (
+                      <button onClick={() => deleteTodo(todo.id)} className="bg-red-500 p-2 rounded transition-colors hover:bg-red-600 text-white">Delete</button>
+                    ) : null}
+                    <button onClick={() => checkTodo(todo.id)} className={todo.completed ? "bg-green-500 p-2 rounded transition-colors hover:bg-green-600 text-white" : "bg-gray-500 p-2 rounded transition-colors hover:bg-gray-600 text-white"}>
+                      {todo.completed ? "Checked" : "Check"}
+                    </button>
                   </div>
                 </div>
               ))) : (
