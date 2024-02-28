@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 
-function navbar() {
+function Navbar() {
   return (
     <nav className='flex justify-between items-center h-[80px] px-16 border-b border-stone-200'>
         <Link href={'/'}>
@@ -15,4 +15,4 @@ function navbar() {
   )
 }
 
-export default navbar
+export default Navbar
