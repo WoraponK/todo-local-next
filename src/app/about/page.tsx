@@ -1,17 +1,9 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import Image from 'next/image'
 
 function aboutPage() {
-
-    useEffect(() => {
-        try {
-            document.title = "About - AppTodo"
-        } catch(e) {
-            console.error(e);
-        }
-    }, [])
 
   return (
     <>
