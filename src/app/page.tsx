@@ -116,9 +116,11 @@ export default function Home() {
 
   return (
     <>
-      <div className="justify-end mb-4 hidden md:flex">
-        <button onClick={deleteAllTodos} className="bg-red-500 p-2 rounded text-white transition-colors hover:bg-red-600">Delete All</button>
-      </div>
+      {todos.length > 0 ? (
+        <div className="justify-end mb-4 hidden md:flex">
+          <button onClick={deleteAllTodos} className="bg-red-500 p-2 rounded text-white transition-colors hover:bg-red-600">Delete All</button>
+        </div>
+      ) : null}
       <div className="grid grid-cols-[20%_80%] space-x-4 max-md:grid-cols-1 max-md:space-x-0 max-md:space-y-8">
         <div>
           <form onSubmit={addTodo} className="grid grid-cols-1 gap-4">
@@ -151,9 +153,11 @@ export default function Home() {
           </form>
         </div>
         <div className="flex flex-col">
-          <div className="justify-end mb-4 hidden max-md:flex">
-            <button onClick={deleteAllTodos} className="bg-red-500 p-2 rounded text-white transition-colors hover:bg-red-600">Delete All</button>
-          </div>
+          {todos.length > 0 ? (
+            <div className="justify-end mb-4 hidden max-md:flex">
+              <button onClick={deleteAllTodos} className="bg-red-500 p-2 rounded text-white transition-colors hover:bg-red-600">Delete All</button>
+            </div>
+          ) : null}
           <div className="flex flex-col gap-2">
             {todos.length > 0 ? (
               todos.map((todo) => (
