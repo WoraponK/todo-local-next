@@ -11,7 +11,7 @@ function aboutPage() {
         } catch(e) {
             console.error(e);
         }
-    })
+    }, [])
 
   return (
     <>
