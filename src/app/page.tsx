@@ -157,13 +157,13 @@ export default function Home() {
           <div className="flex flex-col gap-2">
             {todos.length > 0 ? (
               todos.map((todo) => (
-                <div key={todo.id} className="border border-stone-200 p-2 rounded flex justify-between">
+                <div key={todo.id} className="border border-stone-200 p-2 rounded flex justify-between max-md:flex-col ">
                   <div className="flex flex-col">
                     <span className="text-sm text-stone-500">{todo.timestamp}</span>
                     <h3 className="text-xl font-semibold line-clamp-1">{todo.title}</h3>
                     <p className="line-clamp-4">{todo.description}</p>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 justify-end">
                     {todo.completed ? (
                       <button onClick={() => deleteTodo(todo.id)} className="bg-red-500 p-2 rounded transition-colors hover:bg-red-600 text-white">Delete</button>
                     ) : null}
